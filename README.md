@@ -58,7 +58,7 @@ mInstaCropper.crop(
 );
 ```
 
-It is also possible to use the crop feature via an Intent call. There are various `getIntent()` methods defined on `InstaCropperActivity`.
+It is also possible to use the crop feature via an Intent call. There are various `getIntent()` methods defined on `InstaCropperActivity`. You will then receive the crop result in `data.getData()`.
 ```java
 Intent intent = InstaCropperActivity.getIntent(context, srcUri, dstUri, maxWidth, outputQuality);
 startActivityForResult(intent, REQUEST_CROP);
