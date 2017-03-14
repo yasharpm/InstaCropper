@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -64,6 +65,8 @@ public class InstaCropperView extends View {
 
     private float mDisplayDrawableLeft;
     private float mDisplayDrawableTop;
+
+//    private float mRotation = 0;
 
     private RectF mHelperRect = new RectF();
 
@@ -149,6 +152,12 @@ public class InstaCropperView extends View {
         requestLayout();
         invalidate();
     }
+
+//    public void setRotation(float rotation) {
+//        mRotation = rotation;
+//
+//        invalidate();
+//    }
 
     public void crop(final int widthSpec, final int heightSpec, final BitmapCallback callback) {
         if (mImageUri == null) {
@@ -293,19 +302,33 @@ public class InstaCropperView extends View {
 
     private Bitmap cropImageAndResize(Context context, int left, int top, int right, int bottom, int width, int height) {
         BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 1;
 
         int rawArea = (right - left) * (bottom - top);
         int targetArea = width * height;
 
         int resultArea = rawArea;
 
-        while (resultArea / 4 > targetArea) {
+        while (resultArea > targetArea) {
             options.inSampleSize *= 2;
-            resultArea /= 4;
+            resultArea = rawArea / (options.inSampleSize * options.inSampleSize) ;
+        }
+
+        if (options.inSampleSize > 1) {
+            options.inSampleSize /= 2;
         }
 
         try {
-            Bitmap rawBitmap = BitmapFactory.decodeStream(context.getContentResolver().openInputStream(mImageUri), null, options);
+            Bitmap rawBitmap = MakeDrawableTask.getBitmap(context, mImageUri, options);
+
+            if (rawBitmap == null) {
+                return null;
+            }
+
+            left /= options.inSampleSize;
+            top /= options.inSampleSize;
+            right /= options.inSampleSize;
+            bottom /= options.inSampleSize;
 
             int croppedWidth = right - left;
             int croppedHeight = bottom - top;
@@ -316,7 +339,7 @@ public class InstaCropperView extends View {
                 rawBitmap.recycle();
             }
 
-            if (croppedWidth == width && croppedHeight == height) {
+            if (croppedWidth <= width && croppedHeight <= height) {
                 return croppedBitmap;
             }
 
@@ -325,7 +348,7 @@ public class InstaCropperView extends View {
             croppedBitmap.recycle();
 
             return resizedBitmap;
-        } catch (FileNotFoundException e) {
+        } catch (Throwable t) {
             return null;
         }
     }
@@ -498,22 +521,13 @@ public class InstaCropperView extends View {
             mAnimator.cancel();
         }
 
-        if (isImageSmallerThanView() && isImageSizeRatioValid()) {
-            setDrawableScale(1);
-        }
-        else {
-            scaleDrawableToFitWithinViewWithValidRatio();
-        }
+        scaleDrawableToFitWithinViewWithValidRatio();
 
         placeDrawableInTheCenter();
 
         updateGrid();
 
         invalidate();
-    }
-
-    private boolean isImageSmallerThanView() {
-        return mImageRawWidth <= mWidth && mImageRawHeight <= mHeight;
     }
 
     private boolean isImageSizeRatioValid() {
@@ -545,19 +559,19 @@ public class InstaCropperView extends View {
             boolean drawableIsWiderThanView = drawableRatio > viewRatio;
 
             if (drawableIsWiderThanView) {
-                scale =  (float) mWidth / (float) mDrawable.getIntrinsicWidth();
+                scale =  (float) mWidth / (float) mImageRawWidth;
             }
             else {
-                scale = (float) mHeight / (float) mDrawable.getIntrinsicHeight();
+                scale = (float) mHeight / (float) mImageRawHeight;
             }
         }
         else if (mImageRawWidth < mWidth || mImageRawHeight < mHeight) {
             if (drawableSizeRatio < mMaximumRatio) {
-                getBoundsForWidthAndRatio(mDrawable.getIntrinsicWidth(), mMinimumRatio, mHelperRect);
+                getBoundsForWidthAndRatio(mImageRawWidth, mMinimumRatio, mHelperRect);
                 scale = mHelperRect.height() / (float) mHeight;
             }
             else {
-                getBoundsForHeightAndRatio(mDrawable.getIntrinsicHeight(), mMaximumRatio, mHelperRect);
+                getBoundsForHeightAndRatio(mImageRawHeight, mMaximumRatio, mHelperRect);
                 scale = mHelperRect.width() / (float) mWidth;
             }
         }
@@ -589,11 +603,11 @@ public class InstaCropperView extends View {
     }
 
     private float getDisplayDrawableWidth() {
-        return mDrawableScale * mDrawable.getIntrinsicWidth();
+        return mDrawableScale * mImageRawWidth;
     }
 
     private float getDisplayDrawableHeight() {
-        return mDrawableScale * mDrawable.getIntrinsicHeight();
+        return mDrawableScale * mImageRawHeight;
     }
 
     private void updateGrid() {
@@ -636,6 +650,8 @@ public class InstaCropperView extends View {
         bounds.top = mDisplayDrawableTop;
         bounds.right = bounds.left + getDisplayDrawableWidth();
         bounds.bottom = bounds.top + getDisplayDrawableHeight();
+
+        // TODO This is where rotation will get handled in a happy future.
     }
 
     @Override
@@ -646,9 +662,15 @@ public class InstaCropperView extends View {
             return;
         }
 
+//        canvas.save();
+
+//        canvas.rotate(mRotation, mWidth / 2, mHeight / 2);
+
         getDisplayDrawableBounds(mHelperRect);
         mDrawable.setBounds((int) mHelperRect.left, (int) mHelperRect.top, (int) mHelperRect.right, (int) mHelperRect.bottom);
         mDrawable.draw(canvas);
+
+//        canvas.restore();
 
         mGridDrawable.draw(canvas);
     }
@@ -897,5 +919,36 @@ public class InstaCropperView extends View {
         }
 
     };
+
+//    private void applyRotationToBounds(RectF bounds) {
+//        double rotation = mRotation;
+//
+//        while (rotation >= 360) {
+//            rotation -= 360;
+//        }
+//
+//        while (rotation < 0) {
+//            rotation += 360;
+//        }
+//
+//        if (rotation >= 180) {
+//            rotation -= 180;
+//        }
+//
+//        if (rotation > 90) {
+//            rotation = 180 - rotation;
+//        }
+//
+//        double alpha = rotation / (2 * Math.PI);
+//
+//        double sin = Math.sin(alpha);
+//        double cos = Math.cos(alpha);
+//
+//        double w = bounds.width();
+//        double h = bounds.height();
+//
+//        double yp = (h*cos + w*sin) / (2 * (cos*cos - sin*sin));
+//        double xp = cos == 0 ? 0 : ((sin*yp/cos) + w/2*(cos - sin*sin/cos));
+//    }
 
 }

@@ -5,7 +5,7 @@
 
         <activity android:name=".InstaCropperActivity"
             android:label="@string/instacropper_title"
-            android:theme="@android:style/Theme.DeviceDefault.Light"/>
+            android:theme="@style/InstaCropper"/>
 
     </application>
 
