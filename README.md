@@ -64,8 +64,13 @@ Intent intent = InstaCropperActivity.getIntent(context, srcUri, dstUri, maxWidth
 startActivityForResult(intent, REQUEST_CROP);
 ```
 
-To change the title of the crop Activity and the title of the crop action define the string.
+You can modify the crop Activity's apprearance by overriding the following resouce values:
 ```xml
-<string name="instacropper_title">Crop</string>
-<string name="instacropper_crop">Crop</string>
+<string name="instacropper_title">Crop</string> <!-- Title of toolbar -->
+<string name="instacropper_crop">Crop</string> <!-- Title of crop action in toolbar -->
+
+<color name="instacropper_cropper_background">@android:color/white</color> <!-- Background color of InstaCropperView in the activity -->
+<color name="instacropper_crop_color">@android:color/black</color> <!-- Color of crop action in toolbar -->
+
+<style name="InstaCropper" parent="android:style/Theme.DeviceDefault.Light"/> <!-- Style of crop Activity -->
 ```
