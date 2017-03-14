@@ -8,7 +8,7 @@ A View for cropping images that is similar to Instagram's crop. Also an Activity
 Add the dependency:
 ```Groovy
 dependencies {
-	compile 'com.yashoid:instacropper:1.0.0'
+	compile 'com.yashoid:instacropper:1.0.2'
 }
 ```
 
