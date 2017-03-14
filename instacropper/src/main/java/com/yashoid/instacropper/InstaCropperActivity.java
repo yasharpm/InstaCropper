@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -115,6 +118,23 @@ public class InstaCropperActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_instacropper, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.menu_crop);
+
+        Drawable d = menuItem.getIcon().mutate();
+
+        int color;
+
+        if (Build.VERSION.SDK_INT < 23) {
+            color = getResources().getColor(R.color.instacropper_crop_color);
+        }
+        else {
+            color = getResources().getColor(R.color.instacropper_crop_color, getTheme());
+        }
+
+        d.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+        menuItem.setIcon(d);
 
         return true;
     }
