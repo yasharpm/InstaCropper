@@ -201,6 +201,14 @@ public class InstaCropperView extends View {
                 int actualHeight = actualBottom - actualTop;
                 float actualRatio = (float) actualWidth / (float) actualHeight;
 
+                if (actualRatio < mMinimumRatio) {
+                    actualRatio = mMinimumRatio;
+                }
+
+                if (actualRatio > mMaximumRatio) {
+                    actualRatio = mMaximumRatio;
+                }
+
                 int widthMode = MeasureSpec.getMode(widthSpec);
                 int widthSize = MeasureSpec.getSize(widthSpec);
                 int heightMode = MeasureSpec.getMode(heightSpec);
@@ -577,12 +585,12 @@ public class InstaCropperView extends View {
         }
         else {
             if (drawableSizeRatio < mMinimumRatio) {
-                getBoundsForWidthAndRatio(mWidth, mMinimumRatio, mHelperRect);
-                scale = (float) mHeight / mImageRawHeight;
+                getBoundsForHeightAndRatio(mHeight, mMinimumRatio, mHelperRect);
+                scale = mHelperRect.width() / mImageRawWidth;
             }
             else {
-                getBoundsForHeightAndRatio(mHeight, mMaximumRatio, mHelperRect);
-                scale = (float) mWidth / mImageRawWidth;
+                getBoundsForWidthAndRatio(mWidth, mMaximumRatio, mHelperRect);
+                scale = mHelperRect.height() / mImageRawHeight;
             }
         }
 
