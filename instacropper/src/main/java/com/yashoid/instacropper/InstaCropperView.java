@@ -6,6 +6,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -65,8 +67,6 @@ public class InstaCropperView extends View {
 
     private float mDisplayDrawableLeft;
     private float mDisplayDrawableTop;
-
-//    private float mRotation = 0;
 
     private RectF mHelperRect = new RectF();
 
@@ -148,16 +148,11 @@ public class InstaCropperView extends View {
         cancelMakingDrawableProcessIfExists();
 
         mImageUri = uri;
+        mDrawable = null;
 
         requestLayout();
         invalidate();
     }
-
-//    public void setRotation(float rotation) {
-//        mRotation = rotation;
-//
-//        invalidate();
-//    }
 
     public void crop(final int widthSpec, final int heightSpec, final BitmapCallback callback) {
         if (mImageUri == null) {
@@ -538,9 +533,7 @@ public class InstaCropperView extends View {
         invalidate();
     }
 
-    private boolean isImageSizeRatioValid() {
-        float imageSizeRatio = getImageSizeRatio();
-
+    private boolean isImageSizeRatioValid(float imageSizeRatio) {
         return imageSizeRatio >= mMinimumRatio && imageSizeRatio <= mMaximumRatio;
     }
 
@@ -558,11 +551,11 @@ public class InstaCropperView extends View {
         float scale;
 
         float drawableSizeRatio = getImageSizeRatio();
-        boolean imageSizeRatioIsValid = isImageSizeRatioValid();
+        boolean imageSizeRatioIsValid = isImageSizeRatioValid(drawableSizeRatio);
 
         if (imageSizeRatioIsValid) {
             float viewRatio = (float) mWidth / (float) mHeight;
-            float drawableRatio = (float) mDrawable.getIntrinsicWidth() / (float) mDrawable.getIntrinsicHeight();
+            float drawableRatio = (float) mImageRawWidth / (float) mImageRawHeight;
 
             boolean drawableIsWiderThanView = drawableRatio > viewRatio;
 
@@ -658,8 +651,6 @@ public class InstaCropperView extends View {
         bounds.top = mDisplayDrawableTop;
         bounds.right = bounds.left + getDisplayDrawableWidth();
         bounds.bottom = bounds.top + getDisplayDrawableHeight();
-
-        // TODO This is where rotation will get handled in a happy future.
     }
 
     @Override
@@ -670,15 +661,10 @@ public class InstaCropperView extends View {
             return;
         }
 
-//        canvas.save();
-
-//        canvas.rotate(mRotation, mWidth / 2, mHeight / 2);
-
         getDisplayDrawableBounds(mHelperRect);
+
         mDrawable.setBounds((int) mHelperRect.left, (int) mHelperRect.top, (int) mHelperRect.right, (int) mHelperRect.bottom);
         mDrawable.draw(canvas);
-
-//        canvas.restore();
 
         mGridDrawable.draw(canvas);
     }
@@ -834,6 +820,10 @@ public class InstaCropperView extends View {
         float maximumAllowedScale = getMaximumAllowedScale();
         float minimumAllowedScale = getMinimumAllowedScale();
 
+        if (maximumAllowedScale < minimumAllowedScale) {
+            maximumAllowedScale = minimumAllowedScale;
+        }
+
         if (mDrawableScale < minimumAllowedScale) {
             return mDrawableScale / minimumAllowedScale;
         }
@@ -920,6 +910,7 @@ public class InstaCropperView extends View {
 
             float targetScale = mDrawableScale / overScale;
             float newScale = (1 - animatedValue) * mDrawableScale + animatedValue * targetScale;
+
             setScaleKeepingFocus(newScale, mScaleFocusX, mScaleFocusY);
 
             updateGrid();
@@ -927,36 +918,5 @@ public class InstaCropperView extends View {
         }
 
     };
-
-//    private void applyRotationToBounds(RectF bounds) {
-//        double rotation = mRotation;
-//
-//        while (rotation >= 360) {
-//            rotation -= 360;
-//        }
-//
-//        while (rotation < 0) {
-//            rotation += 360;
-//        }
-//
-//        if (rotation >= 180) {
-//            rotation -= 180;
-//        }
-//
-//        if (rotation > 90) {
-//            rotation = 180 - rotation;
-//        }
-//
-//        double alpha = rotation / (2 * Math.PI);
-//
-//        double sin = Math.sin(alpha);
-//        double cos = Math.cos(alpha);
-//
-//        double w = bounds.width();
-//        double h = bounds.height();
-//
-//        double yp = (h*cos + w*sin) / (2 * (cos*cos - sin*sin));
-//        double xp = cos == 0 ? 0 : ((sin*yp/cos) + w/2*(cos - sin*sin/cos));
-//    }
 
 }

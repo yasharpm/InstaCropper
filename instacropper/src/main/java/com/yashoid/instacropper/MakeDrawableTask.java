@@ -1,12 +1,15 @@
 package com.yashoid.instacropper;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
@@ -88,6 +91,15 @@ public class MakeDrawableTask extends AsyncTask<Void, Void, Drawable> {
                 return null;
             }
 
+            float beforeRatio = (float) mRawWidth / (float) mRawHeight;
+            float afterRatio = (float) bitmap.getWidth() / (float) bitmap.getHeight();
+
+            if ((beforeRatio < 1 && afterRatio > 1) || (beforeRatio > 1 && afterRatio < 1)) {
+                int rawWidth = mRawWidth;
+                mRawWidth = mRawHeight;
+                mRawHeight = rawWidth;
+            }
+
             return new BitmapDrawable(mContext.getResources(), bitmap);
         } catch (FileNotFoundException e) {
             return null;
@@ -120,7 +132,35 @@ public class MakeDrawableTask extends AsyncTask<Void, Void, Drawable> {
             }
         }
 
+        if (bitmap != null) {
+            if (isUriMatching(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, uri) || isUriMatching(MediaStore.Images.Media.INTERNAL_CONTENT_URI, uri)) {
+                Cursor c = context.getContentResolver().query(uri, new String[] {MediaStore.Images.Media.ORIENTATION }, null, null, null);
+
+                if (c.getCount() == 1) {
+                    c.moveToFirst();
+
+                    int orientation = c.getInt(0);
+
+                    c.close();
+
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(orientation);
+
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+                }
+                else {
+                    Log.w(TAG, "Failed to get MediaStore image orientation.");
+
+                    c.close();
+                }
+            }
+        }
+
         return bitmap;
+    }
+
+    private static boolean isUriMatching(Uri path, Uri element) {
+        return Uri.withAppendedPath(path, element.getLastPathSegment()).equals(element);
     }
 
 }
