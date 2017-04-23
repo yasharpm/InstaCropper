@@ -346,7 +346,7 @@ public class InstaCropperView extends View {
                 return croppedBitmap;
             }
 
-            Bitmap resizedBitmap = Bitmap.createScaledBitmap(croppedBitmap, width, height, false);
+            Bitmap resizedBitmap = MakeDrawableTask.resizeBitmap(croppedBitmap, width, height);
 
             croppedBitmap.recycle();
 
