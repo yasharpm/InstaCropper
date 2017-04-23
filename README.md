@@ -3,7 +3,7 @@ A View for cropping images that is similar to Instagram's crop. Also an Activity
 
 ![alt tag](https://cloud.githubusercontent.com/assets/4597931/23830368/724ddf70-071e-11e7-9d7e-65615be8d5e6.gif)
 
-##Usage
+## Usage
 
 Add the dependency:
 ```Groovy
