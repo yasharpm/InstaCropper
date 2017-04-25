@@ -68,11 +68,12 @@ public class MakeDrawableTask extends AsyncTask<Void, Void, Drawable> {
             int resultHeight = mRawHeight;
 
             Runtime.getRuntime().gc();
+
             long totalMemory = Runtime.getRuntime().maxMemory();
             long allowedMemoryToUse = totalMemory / 8;
             int maximumAreaPossibleAccordingToAvailableMemory = (int) (allowedMemoryToUse / 4);
 
-            int targetArea = Math.min(mTargetWidth * mTargetHeight, maximumAreaPossibleAccordingToAvailableMemory);
+            int targetArea = Math.min(mTargetWidth * mTargetHeight * 4, maximumAreaPossibleAccordingToAvailableMemory);
 
             int resultArea = resultWidth * resultHeight;
 

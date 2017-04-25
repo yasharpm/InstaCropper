@@ -308,7 +308,7 @@ public class InstaCropperView extends View {
         options.inSampleSize = 1;
 
         int rawArea = (right - left) * (bottom - top);
-        int targetArea = width * height;
+        int targetArea = width * height * 4;
 
         int resultArea = rawArea;
 

@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 1:
                 if (resultCode == RESULT_OK) {
-//                    Intent intent = InstaCropperActivity.getIntent(this, data.getData(), Uri.fromFile(new File(getExternalCacheDir(), "test.jpg")), 720, 50);
-                    Intent intent = InstaCropperActivity.getIntent(this, Uri.fromFile(getFile()), Uri.fromFile(getFile()), 720, 50);
+                    Intent intent = InstaCropperActivity.getIntent(this, data.getData(), Uri.fromFile(new File(getExternalCacheDir(), "test.jpg")), 720, 50);
+//                    Intent intent = InstaCropperActivity.getIntent(this, Uri.fromFile(getFile()), Uri.fromFile(getFile()), 720, 50);
                     startActivityForResult(intent, 2);
                 }
                 return;
