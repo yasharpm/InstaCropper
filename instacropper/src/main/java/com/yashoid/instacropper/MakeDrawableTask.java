@@ -9,12 +9,15 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * Created by Yashar on 3/8/2017.
@@ -136,30 +139,69 @@ public class MakeDrawableTask extends AsyncTask<Void, Void, Drawable> {
         }
 
         if (bitmap != null) {
-            if (isUriMatching(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, uri) || isUriMatching(MediaStore.Images.Media.INTERNAL_CONTENT_URI, uri)) {
-                Cursor c = context.getContentResolver().query(uri, new String[] {MediaStore.Images.Media.ORIENTATION }, null, null, null);
+            int orientation = getRotation(uri, context);
 
-                if (c.getCount() == 1) {
-                    c.moveToFirst();
+            if (orientation != 0) {
+                Matrix matrix = new Matrix();
+                matrix.postRotate(orientation);
 
-                    int orientation = c.getInt(0);
-
-                    c.close();
-
-                    Matrix matrix = new Matrix();
-                    matrix.postRotate(orientation);
-
-                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
-                }
-                else {
-                    Log.w(TAG, "Failed to get MediaStore image orientation.");
-
-                    c.close();
-                }
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
             }
         }
 
         return bitmap;
+    }
+
+    private static int getRotation(Uri uri, Context context) {
+        if (isUriMatching(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, uri) || isUriMatching(MediaStore.Images.Media.INTERNAL_CONTENT_URI, uri)) {
+            Cursor c = context.getContentResolver().query(uri, new String[] {MediaStore.Images.Media.ORIENTATION }, null, null, null);
+
+            if (c.getCount() == 1) {
+                c.moveToFirst();
+
+                int orientation = c.getInt(0);
+
+                c.close();
+
+                return orientation;
+            }
+            else {
+                Log.w(TAG, "Failed to get MediaStore image orientation.");
+
+                c.close();
+
+                return 0;
+            }
+        }
+
+        try {
+            ExifInterface ei;
+
+            if (Build.VERSION.SDK_INT >= 24) {
+                ei = new ExifInterface(context.getContentResolver().openInputStream(uri));
+            }
+            else {
+                ei = new ExifInterface(uri.toString());
+            }
+
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+            switch(orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return 90;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return 180;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return 270;
+                case ExifInterface.ORIENTATION_NORMAL:
+                default:
+                    return 0;
+            }
+        } catch (IOException e) {
+            Log.w(TAG, "Failed to get image orientation from file.", e);
+
+            return 0;
+        }
     }
 
     protected static Bitmap resizeBitmap(Bitmap bitmap, int newWidth, int newHeight) {
