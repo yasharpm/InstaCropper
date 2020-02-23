@@ -1,3 +1,5 @@
+#### NOTICE: I build custom views "for free". Just send me a description of what you need and I will send it to you the next day!
+
 # InstaCropper
 A View for cropping images that is similar to Instagram's crop. Also an Activity for cropping is included.
 
