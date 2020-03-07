@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/yasharpm/InstaCropper'
     gitUrl = 'https://github.com/yasharpm/InstaCropper.git'
 
-    libraryVersion = '1.0.6'
+    libraryVersion = '1.0.7'
 
     developerId = 'yasharpm'
     developerName = 'Yashar PourMohammad'
@@ -25,16 +25,15 @@ ext {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {

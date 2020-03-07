@@ -566,16 +566,6 @@ public class InstaCropperView extends View {
                 scale = (float) mHeight / (float) mImageRawHeight;
             }
         }
-        else if (mImageRawWidth < mWidth || mImageRawHeight < mHeight) {
-            if (drawableSizeRatio < mMaximumRatio) {
-                getBoundsForWidthAndRatio(mImageRawWidth, mMinimumRatio, mHelperRect);
-                scale = mHelperRect.height() / (float) mHeight;
-            }
-            else {
-                getBoundsForHeightAndRatio(mImageRawHeight, mMaximumRatio, mHelperRect);
-                scale = mHelperRect.width() / (float) mWidth;
-            }
-        }
         else {
             if (drawableSizeRatio < mMinimumRatio) {
                 getBoundsForHeightAndRatio(mHeight, mMinimumRatio, mHelperRect);
