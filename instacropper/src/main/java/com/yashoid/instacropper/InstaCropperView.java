@@ -77,6 +77,8 @@ public class InstaCropperView extends View {
 
     private ValueAnimator mAnimator;
 
+    private OnClickListener mOnClickListener = null;
+
     public InstaCropperView(Context context) {
         super(context);
         initialize(context, null, 0, 0);
@@ -660,6 +662,11 @@ public class InstaCropperView extends View {
     }
 
     @Override
+    public void setOnClickListener(OnClickListener l) {
+        mOnClickListener = l;
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (mDrawable == null) {
             return false;
@@ -689,6 +696,12 @@ public class InstaCropperView extends View {
 
         @Override
         public boolean onSingleTapUp(MotionEvent motionEvent) {
+            if (mOnClickListener != null) {
+                mOnClickListener.onClick(InstaCropperView.this);
+
+                return true;
+            }
+
             return false;
         }
 
