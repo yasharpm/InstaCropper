@@ -24,7 +24,7 @@ import java.io.OutputStream;
 
 public class InstaCropperActivity extends Activity {
 
-    private static final int DEFAULT_OUTPUT_QUALITY = 50;
+    public static final int DEFAULT_OUTPUT_QUALITY = 80;
 
     public static final String EXTRA_OUTPUT = MediaStore.EXTRA_OUTPUT;
 

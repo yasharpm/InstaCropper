@@ -7,6 +7,9 @@
             android:label="@string/instacropper_title"
             android:theme="@style/InstaCropper"/>
 
+        <activity android:name=".MultipleCropActivity"
+            android:theme="@style/InstaCropper"/>
+
     </application>
 
 </manifest>
