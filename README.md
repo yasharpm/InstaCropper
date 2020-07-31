@@ -10,7 +10,7 @@ A View for cropping images that is similar to Instagram's crop. Also an Activity
 Add the dependency:
 ```Groovy
 dependencies {
-	implementation 'com.yashoid:instacropper:1.1.0'
+	implementation 'com.yashoid:instacropper:1.2.0'
 }
 ```
 
@@ -64,6 +64,12 @@ It is also possible to use the crop feature via an Intent call. There are variou
 ```java
 Intent intent = InstaCropperActivity.getIntent(context, srcUri, dstUri, maxWidth, outputQuality);
 startActivityForResult(intent, REQUEST_CROP);
+```
+
+Cropping of multiple images is also possible. Use `MultipleCropActivity.getIntent()` methods to access. If all the images are cropped you will receive `RESULT_OK` otherwise `RESULT_CANCELED`. `EXTRA_COUNT` will contain the number of images cropped.
+```java
+Intent intent = MultipleCropActivity.getIntent(context, srcUris, dstUris, maxWidth, maxHeight, aspectRatio);
+startActivityForResult(intent, REQUEST_MULTIPLE_CROP);
 ```
 
 You can modify the crop Activity's apprearance by overriding the following resouce values:
