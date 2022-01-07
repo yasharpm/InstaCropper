@@ -7,13 +7,21 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -87,6 +95,7 @@ public class InstaCropperActivity extends Activity {
     private int mWidthSpec;
     private int mHeightSpec;
     private int mOutputQuality;
+    private boolean scaleType = true;
 
     private Uri mOutputUri;
 
@@ -113,12 +122,46 @@ public class InstaCropperActivity extends Activity {
         mOutputQuality = intent.getIntExtra(EXTRA_OUTPUT_QUALITY, DEFAULT_OUTPUT_QUALITY);
 
         mOutputUri = intent.getParcelableExtra(EXTRA_OUTPUT);
+
+        try {
+            /*** Button actions ***/
+
+            // crop action
+            TextView cropButton = (TextView) findViewById(R.id.crop_button);
+            cropButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onCropClick();
+                }
+            });
+
+
+            // cancel action
+            TextView cancelButton = (TextView) findViewById(R.id.cancel);
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onCancel();
+                }
+            });
+
+            // toggle scale action
+            ImageButton btnSum = (ImageButton) findViewById(R.id.scale);
+            btnSum.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onScaleClick();
+                }
+            });
+
+        } catch (Exception e) {
+        }
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_instacropper, menu);
-
         MenuItem menuItem = menu.findItem(R.id.menu_crop);
 
         Drawable d = menuItem.getIcon().mutate();
@@ -138,13 +181,66 @@ public class InstaCropperActivity extends Activity {
 
         return true;
     }
+    */
 
+    private boolean onScaleClick() {
+        if(!scaleType) {
+            // fit center
+            scaleType = true;
+            mInstaCropper.scaleDrawableToFitWithinViewWithValidRatio();
+            return true;
+        }
+
+        // Set default position & scale
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+        final float screenHeight = displayMetrics.heightPixels;
+        final float screenWidth = displayMetrics.widthPixels;
+        final float imageHeight = mInstaCropper.getImageRawHeight();
+        final float imageWidth = mInstaCropper.getImageRawWidth();
+
+        float scale = 0;
+
+        if(mInstaCropper.isPortrait()) {
+            // new width = screenWidth
+            float newHeight = screenWidth / imageWidth * imageHeight;
+            scale = newHeight / imageHeight;
+        } else {
+            // new height = screenWidth
+            float newWidth = screenWidth / imageHeight * imageWidth;
+            scale = newWidth / imageWidth;
+        }
+
+        if(scaleType && scale > 0) {
+            // crop center
+            scaleType = false;
+            mInstaCropper.setDrawableScale(scale);
+        } else {
+            // fit center
+            scaleType = true;
+            mInstaCropper.scaleDrawableToFitWithinViewWithValidRatio();
+        }
+        return true;
+    }
+
+    private void onCancel() {
+        finish();
+    }
+
+    private boolean onCropClick() {
+        mInstaCropper.crop(mWidthSpec, mHeightSpec, mBitmapCallback);
+        return true;
+    }
+
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         mInstaCropper.crop(mWidthSpec, mHeightSpec, mBitmapCallback);
 
         return true;
     }
+    */
 
     private InstaCropperView.BitmapCallback mBitmapCallback = new InstaCropperView.BitmapCallback() {
 

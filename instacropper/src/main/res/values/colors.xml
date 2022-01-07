@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="instacropper_cropper_background">@android:color/white</color>
-
+    <color name="instacropper_cropper_background">@android:color/black</color>
+    <color name="instacropper_menu_color">#0e0e0e</color>
     <color name="instacropper_crop_color">@android:color/black</color>
 
 </resources>

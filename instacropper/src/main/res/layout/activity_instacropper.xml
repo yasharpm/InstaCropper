@@ -1,13 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/instacropper_cropper_background">
 
-    <com.yashoid.instacropper.InstaCropperView
-        android:id="@+id/instacropper"
-        android:layout_width="wrap_content"
+
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="@color/instacropper_cropper_background"/>
+        android:layout_centerVertical="true">
+
+        <ImageButton
+            android:id="@+id/scale"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="15dp"
+            android:layout_marginBottom="15dp"
+            android:background="@drawable/roundcorner"
+            android:elevation="1dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_instacropper_crop" />
+
+        <com.yashoid.instacropper.InstaCropperView
+
+            android:id="@+id/instacropper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/border" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:background="@color/instacropper_menu_color"
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="20dp">
+
+        <TextView
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/instacropper_cancel"
+            android:textColor="@android:color/white"
+            android:textSize="18dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            />
+
+        <TextView
+            android:id="@+id/crop_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/instacropper_crop"
+            android:layout_gravity="end"
+            android:textColor="@android:color/white"
+            android:textSize="18dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackgroundBorderless"
+            />
+
+    </FrameLayout>
+
+
+    <!--    <View-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_alignParentBottom="true"-->
+    <!--        android:layout_marginBottom="15dp"-->
+    <!--        >-->
+
+    <!--        <button-->
+    <!--            android:id="@+id/scale"-->
+    <!--            android:icon="@drawable/ic_instacropper_crop"-->
+    <!--            android:showAsAction="always"-->
+    <!--            android:title="@string/instacropper_scale" />-->
+
+    <!--        <item-->
+    <!--            android:id="@+id/menu_crop"-->
+    <!--            android:icon="@drawable/ic_instacropper_crop"-->
+    <!--            android:showAsAction="always"-->
+    <!--            android:title="@string/instacropper_crop" />-->
+
+    <!--    </View>-->
 
 </RelativeLayout>

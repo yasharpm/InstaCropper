@@ -21,6 +21,8 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
+import org.json.JSONObject;
+
 import java.io.FileNotFoundException;
 
 /**
@@ -543,7 +545,7 @@ public class InstaCropperView extends View {
         return (float) mImageRawWidth / (float) mImageRawHeight;
     }
 
-    private void scaleDrawableToFitWithinViewWithValidRatio() {
+    public void scaleDrawableToFitWithinViewWithValidRatio() {
         float scale = getDrawableScaleToFitWithValidRatio();
 
         setDrawableScale(scale);
@@ -554,6 +556,18 @@ public class InstaCropperView extends View {
 
         float drawableSizeRatio = getImageSizeRatio();
         boolean imageSizeRatioIsValid = isImageSizeRatioValid(drawableSizeRatio);
+
+
+//        String a = "getDrawableScaleToFitWithValidRatioZ";
+//        try {
+//            Log.e("INFO", "--- " + a + " " + imageSizeRatioIsValid);
+//            JSONObject json = new JSONObject();
+//            json.put("drawableSizeRatio", drawableSizeRatio);
+//            json.put("imageSizeRatioIsValid", imageSizeRatioIsValid);
+//            Log.e("INFO", "--- " + a + " data " + json.toString());
+//        } catch (Exception e) {
+//            Log.e("INFO", "--- " + a + " error " + e.getMessage());
+//        }
 
         if (imageSizeRatioIsValid) {
             float viewRatio = (float) mWidth / (float) mHeight;
@@ -582,9 +596,10 @@ public class InstaCropperView extends View {
         return scale;
     }
 
-    private void setDrawableScale(float scale) {
-        mDrawableScale = scale;
 
+    public void setDrawableScale(float scale) {
+        mDrawableScale = scale;
+        placeDrawableInTheCenter();
         invalidate();
     }
 
@@ -593,6 +608,18 @@ public class InstaCropperView extends View {
         mDisplayDrawableTop = (mHeight - getDisplayDrawableHeight()) / 2;
 
         invalidate();
+    }
+
+    public boolean isPortrait() {
+        return  mImageRawWidth < mImageRawHeight;
+    }
+
+    public int getImageRawWidth() {
+        return  mImageRawWidth;
+    }
+
+    public int getImageRawHeight() {
+        return  mImageRawHeight;
     }
 
     private float getDisplayDrawableWidth() {
@@ -709,6 +736,16 @@ public class InstaCropperView extends View {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             distanceX = - distanceX;
             distanceY = - distanceY;
+
+//            Log.e("INFO", "---onScroll");
+//            try {
+//                JSONObject json = new JSONObject();
+//                json.put("distanceX", distanceX);
+//                json.put("distanceY", distanceY);
+//                Log.e("INFO", "---menu onScroll scaled " + json.toString());
+//            } catch (Exception e) {
+//                Log.e("INFO", "---JSON onScroll error " + e.getMessage());
+//            }
 
             getDisplayDrawableBounds(mHelperRect);
 

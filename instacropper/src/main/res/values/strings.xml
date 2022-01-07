@@ -1,6 +1,10 @@
 <resources>
-    <string name="instacropper_title">Crop</string>
+    <string name="instacropper_title">Select Image</string>
 
-    <string name="instacropper_crop">Crop</string>
+    <string name="instacropper_cancel">Cancel</string>
+    <string name="instacropper_crop">Choose</string>
+    <string name="instacropper_scale">Scale</string>
+
+    <string name="button_text_size">18dp</string>
 
 </resources>
